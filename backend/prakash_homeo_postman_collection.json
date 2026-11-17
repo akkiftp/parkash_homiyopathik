@@ -1,0 +1,242 @@
+{
+  "info": {
+    "name": "Prakash Homeo Hall API",
+    "description": "Doctor Clinic Online Appointment Booking & Live Queue Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Public Patient & Clinic",
+      "item": [
+        {
+          "name": "Get Clinic Info",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/clinic"
+          }
+        },
+        {
+          "name": "Get Available Slots",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/slots?date=2026-11-18"
+          }
+        },
+        {
+          "name": "Book Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"Ramesh Kumar\",\n  \"mobile\": \"9876543210\",\n  \"clinic_slot_id\": 1,\n  \"notes\": \"Chronic migraine\"\n}"
+            },
+            "url": "{{baseUrl}}/api/appointments"
+          }
+        },
+        {
+          "name": "Track Appointment",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/appointments/PHH-261117-001"
+          }
+        },
+        {
+          "name": "Live Queue (TV & Public)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/queue/live"
+          }
+        },
+        {
+          "name": "Cancel Appointment (Verified)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"reason\": \"Schedule conflict\"\n}"
+            },
+            "url": "{{baseUrl}}/api/appointments/PHH-261117-001/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "Doctor Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@prakashhomeo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/login"
+          }
+        },
+        {
+          "name": "Reception Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"reception@prakashhomeo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/login"
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/me"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/api/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Doctor Dashboard",
+      "item": [
+        {
+          "name": "Doctor Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/dashboard"
+          }
+        },
+        {
+          "name": "Call Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/appointments/1/call"
+          }
+        },
+        {
+          "name": "Start Consultation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/appointments/1/start"
+          }
+        },
+        {
+          "name": "Complete Consultation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/appointments/1/complete"
+          }
+        },
+        {
+          "name": "Pause Queue",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/queue/pause"
+          }
+        },
+        {
+          "name": "Resume Queue",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{doctorToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/doctor/queue/resume"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Reception Dashboard",
+      "item": [
+        {
+          "name": "List Reception Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{receptionToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/reception/appointments"
+          }
+        },
+        {
+          "name": "Walk-in Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{receptionToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_name\": \"Suresh Patel\",\n  \"mobile\": \"9876543213\",\n  \"clinic_slot_id\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/reception/walk-in"
+          }
+        },
+        {
+          "name": "Patient Check-in",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{receptionToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/reception/appointments/2/check-in"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "doctorToken",
+      "value": ""
+    },
+    {
+      "key": "receptionToken",
+      "value": ""
+    }
+  ]
+}
