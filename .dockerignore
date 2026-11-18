@@ -1,0 +1,16 @@
+.git
+.github
+.dart_tool
+.idea
+build
+lib
+test
+web
+windows
+node_modules
+backend/vendor
+backend/node_modules
+backend/storage/logs/*.log
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/framework/cache/data/*
