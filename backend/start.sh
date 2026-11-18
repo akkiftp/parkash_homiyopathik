@@ -7,6 +7,19 @@ if [ -n "$PORT" ]; then
     sed -i "s/<VirtualHost \*:80>/<VirtualHost \*:$PORT>/g" /etc/apache2/sites-available/*.conf
 fi
 
+# Ensure .env exists and has an APP_KEY
+if [ ! -f /var/www/html/.env ]; then
+    if [ -f /var/www/html/.env.example ]; then
+        cp /var/www/html/.env.example /var/www/html/.env
+    else
+        touch /var/www/html/.env
+    fi
+fi
+
+if ! grep -q "APP_KEY=base64:" /var/www/html/.env 2>/dev/null; then
+    php artisan key:generate --force || true
+fi
+
 # Create SQLite database if not present
 mkdir -p /var/www/html/database
 touch /var/www/html/database/database.sqlite
