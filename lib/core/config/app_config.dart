@@ -17,6 +17,17 @@ class AppConfig {
   static Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUrl = prefs.getString('custom_base_url');
+
+    if (kIsWeb) {
+      // On Web (e.g. Firebase Hosting over HTTPS), localhost/127.0.0.1 causes Mixed-Content/CORS
+      // browser blocks. Force live public HTTPS URL if saved URL is empty or localhost.
+      if (savedUrl == null || savedUrl.contains('127.0.0.1') || savedUrl.contains('localhost')) {
+        _baseUrl = livePublicUrl;
+        await prefs.setString('custom_base_url', livePublicUrl);
+        return;
+      }
+    }
+
     if (savedUrl != null && savedUrl.trim().isNotEmpty) {
       _baseUrl = savedUrl.trim();
     } else {

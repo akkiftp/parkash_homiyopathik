@@ -9,6 +9,28 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
+| Root API Health & Clinic Info
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Prakash Homeo Hall Clinic API is live and operational.',
+        'clinic' => 'Prakash Homeo Hall',
+        'doctor' => 'Dr. Om Prakash (B.H.M.S.)',
+        'status' => 'online',
+        'timezone' => 'Asia/Kolkata',
+        'endpoints' => [
+            'clinic' => '/api/clinic',
+            'slots' => '/api/slots?date=' . now()->format('Y-m-d'),
+            'live_queue' => '/api/queue/live',
+            'login' => '/api/login',
+        ],
+    ]);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Public Clinic & Patient APIs
 |--------------------------------------------------------------------------
 */
