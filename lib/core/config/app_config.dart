@@ -5,11 +5,10 @@ class AppConfig {
   static const String defaultLocalhostUrl = 'http://127.0.0.1:8000/api';
   static const String defaultAndroidEmulatorUrl = 'http://10.0.2.2:8000/api';
   
-  static String _baseUrl = kIsWeb
-      ? 'http://127.0.0.1:8000/api'
-      : (defaultTargetPlatform == TargetPlatform.android
-          ? 'http://10.0.2.2:8000/api'
-          : 'http://127.0.0.1:8000/api');
+  // Active Public HTTPS Live API URL
+  static const String livePublicUrl = 'https://steep-yonder-blemish.ngrok-free.dev/api';
+  
+  static String _baseUrl = livePublicUrl;
 
   static String get baseUrl => _baseUrl;
 
@@ -20,6 +19,9 @@ class AppConfig {
     final savedUrl = prefs.getString('custom_base_url');
     if (savedUrl != null && savedUrl.trim().isNotEmpty) {
       _baseUrl = savedUrl.trim();
+    } else {
+      // Default to live public URL so phone, web and external visitors can access immediately
+      _baseUrl = livePublicUrl;
     }
   }
 

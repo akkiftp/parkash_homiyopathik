@@ -145,6 +145,16 @@ class _ServerSettingsDialogState extends State<ServerSettingsDialog> {
               runSpacing: 8,
               children: [
                 ActionChip(
+                  avatar: const Icon(Icons.cloud_done, size: 16, color: AppTheme.accentGreen),
+                  label: const Text('Live Tunnel (Active Now)'),
+                  onPressed: () => _controller.text = AppConfig.livePublicUrl,
+                ),
+                ActionChip(
+                  avatar: const Icon(Icons.cloud_queue, size: 16, color: AppTheme.primaryBlue),
+                  label: const Text('Render (prakash-homeo.onrender.com)'),
+                  onPressed: () => _controller.text = 'https://prakash-homeo-hall.onrender.com/api',
+                ),
+                ActionChip(
                   label: const Text('Localhost (127.0.0.1:8000)'),
                   onPressed: () => _controller.text = 'http://127.0.0.1:8000/api',
                 ),
