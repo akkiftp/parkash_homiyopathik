@@ -30,6 +30,10 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
     super.dispose();
   }
 
+  String _formatDate(DateTime d) {
+    return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+
   void _logout() async {
     await context.read<AuthProvider>().logout();
     if (mounted) {
@@ -54,11 +58,14 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
 
     return Scaffold(
       appBar: AppBar(
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Doctor Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-            Text('Dr. Navneet Srivastava (B.H.M.S.)', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+            const Text('Doctor Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            Text(
+              '${data?.doctorName ?? "Dr. Navneet Srivastava"} (${data?.qualification ?? "B.H.M.S."})',
+              style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+            ),
           ],
         ),
         actions: [
@@ -108,7 +115,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
             ),
             Tab(
               icon: const Icon(Icons.list_alt, size: 20),
-              text: "All Today (${allToday.length})",
+              text: "All Appointments (${allToday.length})",
             ),
           ],
         ),
@@ -121,6 +128,61 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Date Filter Row (Dynamic Date Switcher)
+                Card(
+                  elevation: 0,
+                  color: const Color(0xFFF8FAFC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.calendar_today_rounded, size: 16, color: AppTheme.primaryBlue),
+                        const SizedBox(width: 8),
+                        Text(
+                          prov.selectedDate.isEmpty
+                              ? 'Date: Today'
+                              : 'Date: ${prov.selectedDate}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                        ),
+                        const Spacer(),
+                        ChoiceChip(
+                          label: const Text('Today', style: TextStyle(fontSize: 11)),
+                          selected: prov.selectedDate.isEmpty || prov.selectedDate == _formatDate(DateTime.now()),
+                          onSelected: (_) => prov.setSelectedDate(_formatDate(DateTime.now())),
+                        ),
+                        const SizedBox(width: 6),
+                        ChoiceChip(
+                          label: const Text('Tomorrow', style: TextStyle(fontSize: 11)),
+                          selected: prov.selectedDate == _formatDate(DateTime.now().add(const Duration(days: 1))),
+                          onSelected: (_) => prov.setSelectedDate(_formatDate(DateTime.now().add(const Duration(days: 1)))),
+                        ),
+                        const SizedBox(width: 6),
+                        IconButton(
+                          icon: const Icon(Icons.event_note_rounded, size: 20, color: AppTheme.primaryBlue),
+                          tooltip: 'Select Custom Date',
+                          onPressed: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                              lastDate: DateTime.now().add(const Duration(days: 30)),
+                            );
+                            if (picked != null) {
+                              prov.setSelectedDate(_formatDate(picked));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
                 // Action Feedback Banners
                 if (prov.errorMessage != null) ...[
                   Container(
@@ -514,7 +576,12 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: allToday.isEmpty
-                              ? const Center(child: Text('No appointments recorded today.'))
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(32),
+                                    child: Text('No appointments recorded for this date.'),
+                                  ),
+                                )
                               : ListView.separated(
                                   itemCount: allToday.length,
                                   separatorBuilder: (_, _) => const Divider(height: 1),
@@ -530,16 +597,71 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                                       ),
                                       title: Text(item.patientName, style: const TextStyle(fontWeight: FontWeight.bold)),
                                       subtitle: Text('${item.bookingId} • ${item.appointmentTime} • Mobile: ${item.mobile}'),
-                                      trailing: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: item.statusColor.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          item.statusDisplay,
-                                          style: TextStyle(color: item.statusColor, fontSize: 11, fontWeight: FontWeight.bold),
-                                        ),
+                                      trailing: Wrap(
+                                        spacing: 8,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: item.statusColor.withValues(alpha: 0.12),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              item.statusDisplay,
+                                              style: TextStyle(color: item.statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          if (item.isCheckedIn || item.isWaiting) ...[
+                                            ElevatedButton(
+                                              onPressed: isPaused ? null : () => prov.callPatient(item.id!),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: AppTheme.primaryBlue,
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              child: const Text('Call', style: TextStyle(fontSize: 11)),
+                                            ),
+                                          ] else if (item.isCalled) ...[
+                                            ElevatedButton(
+                                              onPressed: () => prov.startConsultation(item.id!),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color(0xFF8B5CF6),
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              child: const Text('Start', style: TextStyle(fontSize: 11)),
+                                            ),
+                                          ] else if (item.isInConsultation) ...[
+                                            ElevatedButton(
+                                              onPressed: () => prov.completeConsultation(item.id!),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: AppTheme.accentGreen,
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              child: const Text('Complete', style: TextStyle(fontSize: 11)),
+                                            ),
+                                          ] else if (item.isBooked) ...[
+                                            OutlinedButton(
+                                              onPressed: () => prov.checkInPatient(item.id!),
+                                              style: OutlinedButton.styleFrom(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              child: const Text('Check In', style: TextStyle(fontSize: 11)),
+                                            ),
+                                          ] else if (item.isSkipped) ...[
+                                            OutlinedButton(
+                                              onPressed: isPaused ? null : () => prov.callPatient(item.id!),
+                                              style: OutlinedButton.styleFrom(
+                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                visualDensity: VisualDensity.compact,
+                                              ),
+                                              child: const Text('Re-call', style: TextStyle(fontSize: 11)),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     );
                                   },

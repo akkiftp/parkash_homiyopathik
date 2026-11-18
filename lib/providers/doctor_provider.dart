@@ -6,6 +6,7 @@ class DoctorProvider extends ChangeNotifier {
   final DoctorService _service = DoctorService();
 
   DoctorDashboardData? _dashboardData;
+  String _selectedDate = '';
   bool _isLoading = false;
   bool _isFetching = false;
   String? _errorMessage;
@@ -13,9 +14,16 @@ class DoctorProvider extends ChangeNotifier {
   Timer? _pollingTimer;
 
   DoctorDashboardData? get dashboardData => _dashboardData;
+  String get selectedDate => _selectedDate;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get actionSuccessMessage => _actionSuccessMessage;
+
+  void setSelectedDate(String date) {
+    if (_selectedDate == date) return;
+    _selectedDate = date;
+    fetchDashboard(showLoadingIndicator: true);
+  }
 
   void startPolling() {
     _stopTimer();
@@ -35,7 +43,7 @@ class DoctorProvider extends ChangeNotifier {
       notifyListeners();
     }
 
-    final res = await _service.getDashboard();
+    final res = await _service.getDashboard(date: _selectedDate);
     _isFetching = false;
     _isLoading = false;
 
@@ -48,6 +56,21 @@ class DoctorProvider extends ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  Future<bool> checkInPatient(int id) async {
+    _actionSuccessMessage = null;
+    _errorMessage = null;
+    final res = await _service.checkInPatient(id);
+    if (res.success) {
+      _actionSuccessMessage = res.message;
+      await fetchDashboard();
+      return true;
+    } else {
+      _errorMessage = res.message;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> callPatient(int id) async {

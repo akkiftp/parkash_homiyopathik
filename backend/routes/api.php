@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:doctor')->prefix('doctor')->group(function () {
         Route::get('/dashboard', [DoctorController::class, 'dashboard']);
         Route::get('/appointments', [DoctorController::class, 'appointments']);
+        Route::post('/appointments/{id}/check-in', [DoctorController::class, 'checkIn']);
         Route::post('/appointments/{id}/call', [DoctorController::class, 'callPatient']);
         Route::post('/appointments/{id}/start', [DoctorController::class, 'startConsultation']);
         Route::post('/appointments/{id}/complete', [DoctorController::class, 'completeConsultation']);

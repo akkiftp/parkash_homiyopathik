@@ -14,16 +14,17 @@ class DoctorController extends Controller
     /**
      * Doctor Dashboard Summary & Current Queue State
      */
-    public function dashboard(): JsonResponse
+    public function dashboard(Request $request): JsonResponse
     {
+        $selectedDate = $request->input('date', Carbon::today('Asia/Kolkata')->format('Y-m-d'));
         $todayStr = Carbon::today('Asia/Kolkata')->format('Y-m-d');
 
         $queueSetting = QueueSetting::first();
         $isPaused = $queueSetting ? (bool)$queueSetting->queue_paused : false;
 
         $todayAppointments = Appointment::with('slot')
-            ->whereHas('slot', function ($q) use ($todayStr) {
-                $q->where('slot_date', $todayStr);
+            ->whereHas('slot', function ($q) use ($selectedDate) {
+                $q->where('slot_date', $selectedDate);
             })
             ->orderBy('token_number', 'asc')
             ->get();
@@ -40,10 +41,20 @@ class DoctorController extends Controller
         // Currently called
         $calledPatient = $todayAppointments->where('status', 'called')->first();
 
+        $user = auth()->user();
+        $setting = \App\Models\ClinicSetting::first();
+
         return response()->json([
             'success' => true,
             'message' => 'Doctor dashboard data loaded successfully.',
             'data' => [
+                'doctor_name' => $user?->name ?? ($setting?->doctor_name ?? 'Dr. Navneet Srivastava'),
+                'doctor_email' => $user?->email ?? 'doctor@prakashhomeo.com',
+                'clinic_name' => $setting?->clinic_name ?? 'Prakash Homeo Hall',
+                'qualification' => $setting?->qualification ?? 'B.H.M.S.',
+                'specialization' => $setting?->specialization ?? 'Classical Homeopathy & Chronic Care',
+                'selected_date' => $selectedDate,
+                'is_today' => ($selectedDate === $todayStr),
                 'summary' => [
                     'total_today' => $totalToday,
                     'completed_today' => $completedToday,
@@ -134,6 +145,35 @@ class DoctorController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Patient ' . $appointment->patient_name . ' (Token #' . $appointment->token_number . ') has been called.',
+            'data' => $this->formatAppointment($appointment),
+        ]);
+    }
+
+    /**
+     * Check-in Patient (Doctor Desk direct action)
+     */
+    public function checkIn(int $id): JsonResponse
+    {
+        $appointment = Appointment::with('slot')->find($id);
+        if (!$appointment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Appointment not found.',
+            ], 404);
+        }
+
+        DB::transaction(function () use ($appointment) {
+            $oldStatus = $appointment->status;
+            $appointment->status = 'checked_in';
+            $appointment->checked_in_at = Carbon::now('Asia/Kolkata');
+            $appointment->save();
+
+            $appointment->logStatusChange($oldStatus, 'checked_in', auth()->user()?->name ?? 'Doctor');
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Patient ' . $appointment->patient_name . ' has been checked in and added to waiting queue.',
             'data' => $this->formatAppointment($appointment),
         ]);
     }

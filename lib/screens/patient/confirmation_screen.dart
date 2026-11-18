@@ -1,25 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/storage/local_storage.dart';
 import '../../core/theme/app_theme.dart';
 import '../../models/appointment_model.dart';
 import 'tracking_screen.dart';
 
-class ConfirmationScreen extends StatelessWidget {
+class ConfirmationScreen extends StatefulWidget {
   final AppointmentModel appointment;
 
   const ConfirmationScreen({super.key, required this.appointment});
 
+  @override
+  State<ConfirmationScreen> createState() => _ConfirmationScreenState();
+}
+
+class _ConfirmationScreenState extends State<ConfirmationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Auto save last booking ID locally for convenient 1-tap tracking
+    LocalStorage.saveLastBookingId(widget.appointment.bookingId);
+  }
+
+  void _copyBookingId(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: widget.appointment.bookingId));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'बुकिंग कोड (${widget.appointment.bookingId}) कॉपी हो गया! अब आप इसे आसानी से ट्रैक कर सकते हैं।',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppTheme.accentGreen,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _copyToken(BuildContext context) {
+    final token = widget.appointment.tokenNumber ?? 1;
+    Clipboard.setData(ClipboardData(text: 'Token #$token - Booking ID: ${widget.appointment.bookingId}'));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('टोकन नंबर #$token और बुकिंग कोड कॉपी हो गया! 📋'),
+        backgroundColor: AppTheme.primaryBlue,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _shareSlip(BuildContext context) {
+    final apt = widget.appointment;
     final text = '''
 =================================
 🏥 PRAKASH HOMEO HALL (प्रकाश होमियो हॉल)
-डॉ. ओम प्रकाश (B.H.M.S.)
+डॉ. नवनीत श्रीवास्तव (B.H.M.S.)
 =================================
-📋 बुकिंग कोड: ${appointment.bookingId}
-🎫 टोकन नंबर: #${appointment.tokenNumber ?? 'N/A'}
-👤 मरीज का नाम: ${appointment.patientName}
-📅 तारीख: ${appointment.appointmentDate}
-⏰ समय: ${appointment.appointmentTime}
+📋 बुकिंग कोड: ${apt.bookingId}
+🎫 टोकन नंबर: #${apt.tokenNumber ?? 'N/A'}
+👤 मरीज का नाम: ${apt.patientName}
+📅 तारीख: ${apt.appointmentDate}
+⏰ समय: ${apt.appointmentTime}
 📍 पता: चौक, चंदियाना, फतेहपुर, उ.प्र. - 212601
 📞 फोन: +91 94150 12345
 =================================
@@ -37,6 +85,7 @@ class ConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appointment = widget.appointment;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -167,29 +216,40 @@ class ConfirmationScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(20),
                           child: Row(
                             children: [
-                              // Token Big Badge
-                              Container(
-                                width: 90,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryLightBlue,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
-                                ),
-                                child: Column(
-                                  children: [
-                                    const Text('TOKEN', style: TextStyle(color: AppTheme.primaryDarkBlue, fontSize: 11, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '#${appointment.tokenNumber ?? "1"}',
-                                      style: const TextStyle(
-                                        color: AppTheme.primaryDarkBlue,
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.w900,
+                              // Token Big Badge (Clickable to copy)
+                              InkWell(
+                                onTap: () => _copyToken(context),
+                                borderRadius: BorderRadius.circular(14),
+                                child: Container(
+                                  width: 95,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryLightBlue,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      const Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text('TOKEN', style: TextStyle(color: AppTheme.primaryDarkBlue, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          SizedBox(width: 4),
+                                          Icon(Icons.copy, size: 11, color: AppTheme.primaryBlue),
+                                        ],
                                       ),
-                                    ),
-                                    const Text('OPD Pass', style: TextStyle(color: AppTheme.textMuted, fontSize: 10)),
-                                  ],
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '#${appointment.tokenNumber ?? "1"}',
+                                        style: const TextStyle(
+                                          color: AppTheme.primaryDarkBlue,
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                      const Text('Tap to copy', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 9, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -197,15 +257,40 @@ class ConfirmationScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('BOOKING ID', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textMuted)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      appointment.bookingId,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme.textDark,
-                                        letterSpacing: 0.5,
+                                    const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('BOOKING ID', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textMuted)),
+                                        Text('टैप करके कॉपी करें', style: TextStyle(fontSize: 10, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    InkWell(
+                                      onTap: () => _copyBookingId(context),
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF1F5F9),
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              appointment.bookingId,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppTheme.textDark,
+                                                letterSpacing: 0.5,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            const Icon(Icons.copy_rounded, size: 16, color: AppTheme.primaryBlue),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 6),

@@ -8,6 +8,13 @@ class DoctorDashboardData {
   final AppointmentModel? calledPatient;
   final List<AppointmentModel> waitingList;
   final List<AppointmentModel> allToday;
+  final String doctorName;
+  final String doctorEmail;
+  final String clinicName;
+  final String qualification;
+  final String specialization;
+  final String selectedDate;
+  final bool isToday;
 
   DoctorDashboardData({
     required this.summary,
@@ -16,6 +23,13 @@ class DoctorDashboardData {
     this.calledPatient,
     required this.waitingList,
     required this.allToday,
+    this.doctorName = 'Dr. Navneet Srivastava',
+    this.doctorEmail = 'doctor@prakashhomeo.com',
+    this.clinicName = 'Prakash Homeo Hall',
+    this.qualification = 'B.H.M.S.',
+    this.specialization = 'Classical Homeopathy & Chronic Care',
+    this.selectedDate = '',
+    this.isToday = true,
   });
 
   factory DoctorDashboardData.fromJson(Map<String, dynamic> json) {
@@ -33,6 +47,13 @@ class DoctorDashboardData {
           : null,
       waitingList: rawWaiting.map((e) => AppointmentModel.fromJson(e as Map<String, dynamic>)).toList(),
       allToday: rawAll.map((e) => AppointmentModel.fromJson(e as Map<String, dynamic>)).toList(),
+      doctorName: json['doctor_name'] ?? 'Dr. Navneet Srivastava',
+      doctorEmail: json['doctor_email'] ?? 'doctor@prakashhomeo.com',
+      clinicName: json['clinic_name'] ?? 'Prakash Homeo Hall',
+      qualification: json['qualification'] ?? 'B.H.M.S.',
+      specialization: json['specialization'] ?? 'Classical Homeopathy & Chronic Care',
+      selectedDate: json['selected_date'] ?? '',
+      isToday: json['is_today'] ?? true,
     );
   }
 }
@@ -40,10 +61,18 @@ class DoctorDashboardData {
 class DoctorService {
   final ApiService _api = ApiService();
 
-  Future<ApiResponse<DoctorDashboardData>> getDashboard() async {
+  Future<ApiResponse<DoctorDashboardData>> getDashboard({String? date}) async {
     return _api.get<DoctorDashboardData>(
       '/doctor/dashboard',
+      queryParameters: (date != null && date.isNotEmpty) ? {'date': date} : null,
       fromData: (data) => DoctorDashboardData.fromJson(data as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<AppointmentModel>> checkInPatient(int id) async {
+    return _api.post<AppointmentModel>(
+      '/doctor/appointments/$id/check-in',
+      fromData: (data) => AppointmentModel.fromJson(data as Map<String, dynamic>),
     );
   }
 

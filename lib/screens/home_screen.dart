@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../core/storage/local_storage.dart';
 import '../core/theme/app_theme.dart';
@@ -49,65 +50,98 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _showTrackDialog({String? presetCode}) {
+  void _showTrackDialog({String? presetCode}) async {
+    final recentBooking = await LocalStorage.getLastBookingId();
     if (presetCode != null && presetCode.isNotEmpty) {
       _trackInputController.text = presetCode;
+    } else if (recentBooking != null && recentBooking.isNotEmpty && _trackInputController.text.isEmpty) {
+      _trackInputController.text = recentBooking;
     }
+
+    if (!mounted) return;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppTheme.primaryLightBlue,
-              child: Icon(Icons.search, color: AppTheme.primaryBlue, size: 20),
-            ),
-            SizedBox(width: 12),
-            Text('Track Appointment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Enter your Booking ID (जैसे: PHH-261118-001) to view live token & queue position:',
-              style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _trackInputController,
-              textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(
-                hintText: 'PHH-XXXXXX-XXX',
-                prefixIcon: Icon(Icons.confirmation_number_outlined),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: AppTheme.primaryLightBlue,
+                child: Icon(Icons.search, color: AppTheme.primaryBlue, size: 20),
               ),
+              SizedBox(width: 12),
+              Text('Track Appointment', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Enter your Booking ID (जैसे: PHH-261118-001) to view live token & queue position:',
+                style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _trackInputController,
+                textCapitalization: TextCapitalization.characters,
+                decoration: InputDecoration(
+                  hintText: 'PHH-XXXXXX-XXX',
+                  prefixIcon: const Icon(Icons.confirmation_number_outlined),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.content_paste, size: 20),
+                    tooltip: 'Paste from Clipboard',
+                    onPressed: () async {
+                      final data = await Clipboard.getData(Clipboard.kTextPlain);
+                      if (data?.text != null && data!.text!.trim().isNotEmpty) {
+                        setDialogState(() {
+                          _trackInputController.text = data.text!.trim().toUpperCase();
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ),
+              if (recentBooking != null && recentBooking.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                ActionChip(
+                  avatar: const Icon(Icons.history, size: 16, color: AppTheme.primaryBlue),
+                  label: Text('Use Recent: $recentBooking', style: const TextStyle(fontSize: 12)),
+                  backgroundColor: AppTheme.primaryLightBlue,
+                  onPressed: () {
+                    setDialogState(() {
+                      _trackInputController.text = recentBooking;
+                    });
+                  },
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final code = _trackInputController.text.trim();
+                if (code.isNotEmpty) {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TrackingScreen(initialBookingCode: code),
+                    ),
+                  );
+                }
+              },
+              child: const Text('Track Live Status'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final code = _trackInputController.text.trim();
-              if (code.isNotEmpty) {
-                Navigator.pop(ctx);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TrackingScreen(initialBookingCode: code),
-                  ),
-                );
-              }
-            },
-            child: const Text('Track Live Status'),
-          ),
-        ],
       ),
     );
   }

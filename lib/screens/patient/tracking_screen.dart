@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../core/storage/local_storage.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/tracking_provider.dart';
 
@@ -14,14 +16,30 @@ class TrackingScreen extends StatefulWidget {
 
 class _TrackingScreenState extends State<TrackingScreen> {
   final TextEditingController _codeController = TextEditingController();
+  String? _recentBooking;
 
   @override
   void initState() {
     super.initState();
-    if (widget.initialBookingCode != null && widget.initialBookingCode!.isNotEmpty) {
-      _codeController.text = widget.initialBookingCode!;
+    _initBookingCode();
+  }
+
+  void _initBookingCode() async {
+    final recent = await LocalStorage.getLastBookingId();
+    if (mounted) {
+      setState(() {
+        _recentBooking = recent;
+      });
+    }
+
+    final codeToTrack = (widget.initialBookingCode != null && widget.initialBookingCode!.isNotEmpty)
+        ? widget.initialBookingCode!
+        : recent;
+
+    if (codeToTrack != null && codeToTrack.isNotEmpty) {
+      _codeController.text = codeToTrack;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<TrackingProvider>().startTracking(widget.initialBookingCode!);
+        context.read<TrackingProvider>().startTracking(codeToTrack);
       });
     }
   }
@@ -35,6 +53,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   void _search() {
     final code = _codeController.text.trim();
     if (code.isNotEmpty) {
+      LocalStorage.saveLastBookingId(code);
       context.read<TrackingProvider>().startTracking(code);
     }
   }
@@ -198,35 +217,67 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _codeController,
-                            textCapitalization: TextCapitalization.characters,
-                            decoration: const InputDecoration(
-                              labelText: 'Enter Booking ID',
-                              hintText: 'PHH-261118-001',
-                              prefixIcon: Icon(Icons.search),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _codeController,
+                                textCapitalization: TextCapitalization.characters,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Booking ID',
+                                  hintText: 'PHH-261118-001',
+                                  prefixIcon: const Icon(Icons.search),
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.content_paste, size: 20),
+                                    tooltip: 'Paste Copied Booking ID',
+                                    onPressed: () async {
+                                      final data = await Clipboard.getData(Clipboard.kTextPlain);
+                                      if (data?.text != null && data!.text!.trim().isNotEmpty) {
+                                        setState(() {
+                                          _codeController.text = data.text!.trim().toUpperCase();
+                                        });
+                                        _search();
+                                      }
+                                    },
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                ),
+                                onSubmitted: (_) => _search(),
+                              ),
                             ),
-                            onSubmitted: (_) => _search(),
-                          ),
+                            const SizedBox(width: 12),
+                            ElevatedButton(
+                              onPressed: prov.isLoading ? null : _search,
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                              ),
+                              child: prov.isLoading
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : const Text('Track'),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: prov.isLoading ? null : _search,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                        if (_recentBooking != null && _recentBooking!.isNotEmpty && _recentBooking != _codeController.text) ...[
+                          const SizedBox(height: 10),
+                          ActionChip(
+                            avatar: const Icon(Icons.history, size: 16, color: AppTheme.primaryBlue),
+                            label: Text('Recent: $_recentBooking (1-Tap Track)', style: const TextStyle(fontSize: 12)),
+                            backgroundColor: AppTheme.primaryLightBlue,
+                            onPressed: () {
+                              setState(() {
+                                _codeController.text = _recentBooking!;
+                              });
+                              _search();
+                            },
                           ),
-                          child: prov.isLoading
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
-                              : const Text('Track'),
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -395,29 +446,50 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       padding: const EdgeInsets.all(20),
                       child: Row(
                         children: [
-                          Container(
-                            width: 100,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            decoration: BoxDecoration(
-                              gradient: AppTheme.primaryGradient,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              children: [
-                                const Text('YOUR TOKEN', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
-                                Text(
-                                  apt.tokenNumber != null ? '#${apt.tokenNumber}' : '--',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.w900,
+                          InkWell(
+                            onTap: () {
+                              final token = apt.tokenNumber ?? 1;
+                              Clipboard.setData(ClipboardData(text: 'Token #$token - Booking: ${apt.bookingId}'));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('टोकन नंबर #$token कॉपी हो गया! 📋'),
+                                  backgroundColor: AppTheme.primaryBlue,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: 105,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.primaryGradient,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('YOUR TOKEN', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      SizedBox(width: 4),
+                                      Icon(Icons.copy, size: 10, color: Colors.white70),
+                                    ],
                                   ),
-                                ),
-                                Text(
-                                  apt.status.toUpperCase(),
-                                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                                  Text(
+                                    apt.tokenNumber != null ? '#${apt.tokenNumber}' : '--',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 34,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  Text(
+                                    apt.status.toUpperCase(),
+                                    style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(width: 18),
@@ -429,8 +501,37 @@ class _TrackingScreenState extends State<TrackingScreen> {
                                   apt.patientName,
                                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textDark),
                                 ),
-                                const SizedBox(height: 2),
-                                Text('Booking Code: ${apt.bookingId}', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                                const SizedBox(height: 4),
+                                InkWell(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(text: apt.bookingId));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('बुकिंग कोड (${apt.bookingId}) कॉपी हो गया! 📋'),
+                                        backgroundColor: AppTheme.accentGreen,
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('ID: ${apt.bookingId}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryDarkBlue)),
+                                        const SizedBox(width: 6),
+                                        const Icon(Icons.copy, size: 13, color: AppTheme.primaryBlue),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
                                 Text('Slot Time: ${apt.appointmentTime} (15m)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue)),
                                 const SizedBox(height: 6),
                                 Container(
