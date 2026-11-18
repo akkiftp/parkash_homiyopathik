@@ -101,7 +101,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${queue?.doctorName ?? "Dr. Om Prakash"} • ${queue?.specialization ?? "Classical Homeopathy"}',
+                            '${queue?.doctorName ?? "Dr. Navneet Srivastava"} • ${queue?.specialization ?? "Classical Homeopathy"}',
                             style: const TextStyle(
                               color: AppTheme.tvAccentCyan,
                               fontSize: 15,

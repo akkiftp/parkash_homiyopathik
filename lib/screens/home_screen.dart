@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Row(
                                     children: [
                                       Text(
-                                        info?.doctorName ?? 'Dr. Om Prakash',
+                                        info?.doctorName ?? 'Dr. Navneet Srivastava',
                                         style: const TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,

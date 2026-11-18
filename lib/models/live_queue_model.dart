@@ -33,7 +33,7 @@ class LiveQueueModel {
 
     return LiveQueueModel(
       clinicName: json['clinic_name'] ?? 'Prakash Homeo Hall',
-      doctorName: json['doctor_name'] ?? 'Dr. Om Prakash',
+      doctorName: json['doctor_name'] ?? 'Dr. Navneet Srivastava',
       specialization: json['specialization'] ?? 'Classical Homeopathy',
       queuePaused: json['queue_paused'] ?? false,
       currentToken: json['current_token'],

@@ -8,7 +8,7 @@ Route::get('/', function () {
         'message' => 'Prakash Homeo Hall Clinic Server is running.',
         'api_url' => url('/api'),
         'clinic' => 'Prakash Homeo Hall',
-        'doctor' => 'Dr. Om Prakash (B.H.M.S.)',
+        'doctor' => 'Dr. Navneet Srivastava (B.H.M.S.)',
         'status' => 'online',
     ]);
 });

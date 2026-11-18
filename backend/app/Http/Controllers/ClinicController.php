@@ -29,7 +29,7 @@ class ClinicController extends Controller
         if (!$setting) {
             $setting = ClinicSetting::create([
                 'clinic_name' => 'Prakash Homeo Hall',
-                'doctor_name' => 'Dr. Om Prakash',
+                'doctor_name' => 'Dr. Navneet Srivastava',
                 'qualification' => 'B.H.M.S. (Senior Homeopathic Consultant)',
                 'specialization' => 'Classical Homeopathy & Chronic Care',
                 'address' => 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601',
@@ -169,7 +169,7 @@ class ClinicController extends Controller
             'message' => 'Live queue status fetched.',
             'data' => [
                 'clinic_name' => $setting ? $setting->clinic_name : 'Prakash Homeo Hall',
-                'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Om Prakash',
+                'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Navneet Srivastava',
                 'specialization' => $setting ? $setting->specialization : 'Classical Homeopathy',
                 'queue_paused' => $isPaused,
                 'current_token' => $currentToken,

@@ -116,7 +116,7 @@ class AppointmentController extends Controller
                     'token_number' => $appointment->token_number,
                     'status' => $appointment->status,
                     'clinic_name' => $setting ? $setting->clinic_name : 'Prakash Homeo Hall',
-                    'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Om Prakash',
+                    'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Navneet Srivastava',
                     'address' => $setting ? $setting->address : 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh',
                 ],
             ], 201);
@@ -208,7 +208,7 @@ class AppointmentController extends Controller
                 'patients_ahead' => $patientsAhead,
                 'estimated_wait_minutes' => $estimatedWaitMinutes,
                 'clinic_name' => $setting ? $setting->clinic_name : 'Prakash Homeo Hall',
-                'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Om Prakash',
+                'doctor_name' => $setting ? $setting->doctor_name : 'Dr. Navneet Srivastava',
                 'address' => $setting ? $setting->address : 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh',
                 'checked_in_at' => $appointment->checked_in_at?->format('g:i A'),
                 'called_at' => $appointment->called_at?->format('g:i A'),

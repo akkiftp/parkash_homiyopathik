@@ -142,7 +142,7 @@ class ConfirmationScreen extends StatelessWidget {
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5),
                                   ),
                                   Text(
-                                    'Dr. Om Prakash (B.H.M.S.)',
+                                    'Dr. Navneet Srivastava (B.H.M.S.)',
                                     style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12),
                                   ),
                                 ],

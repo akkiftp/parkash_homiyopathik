@@ -8,7 +8,7 @@ void main() {
     test('ClinicInfo parses correctly from JSON', () {
       final json = {
         'clinic_name': 'Prakash Homeo Hall',
-        'doctor_name': 'Dr. Om Prakash',
+        'doctor_name': 'Dr. Navneet Srivastava',
         'qualification': 'B.H.M.S.',
         'specialization': 'Classical Homeopathy',
         'address': 'Chowk, Chandiyana, Fatehpur',
@@ -29,7 +29,7 @@ void main() {
 
       final clinic = ClinicInfo.fromJson(json);
       expect(clinic.clinicName, 'Prakash Homeo Hall');
-      expect(clinic.doctorName, 'Dr. Om Prakash');
+      expect(clinic.doctorName, 'Dr. Navneet Srivastava');
       expect(clinic.slotDuration, 15);
       expect(clinic.opdTimings.length, 1);
       expect(clinic.queuePaused, false);

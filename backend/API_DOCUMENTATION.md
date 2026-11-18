@@ -18,7 +18,7 @@ Default Timezone: `Asia/Kolkata`
   "message": "Clinic details fetched successfully.",
   "data": {
     "clinic_name": "Prakash Homeo Hall",
-    "doctor_name": "Dr. Om Prakash",
+    "doctor_name": "Dr. Navneet Srivastava",
     "qualification": "B.H.M.S. (Senior Homeopathic Consultant)",
     "specialization": "Classical Homeopathy & Chronic Care",
     "address": "Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601",
@@ -104,7 +104,7 @@ Default Timezone: `Asia/Kolkata`
     "token_number": 1,
     "status": "booked",
     "clinic_name": "Prakash Homeo Hall",
-    "doctor_name": "Dr. Om Prakash",
+    "doctor_name": "Dr. Navneet Srivastava",
     "address": "Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601"
   }
 }
@@ -135,7 +135,7 @@ Default Timezone: `Asia/Kolkata`
     "patients_ahead": 0,
     "estimated_wait_minutes": 0,
     "clinic_name": "Prakash Homeo Hall",
-    "doctor_name": "Dr. Om Prakash"
+    "doctor_name": "Dr. Navneet Srivastava"
   }
 }
 ```
@@ -152,7 +152,7 @@ Default Timezone: `Asia/Kolkata`
   "message": "Live queue status fetched.",
   "data": {
     "clinic_name": "Prakash Homeo Hall",
-    "doctor_name": "Dr. Om Prakash",
+    "doctor_name": "Dr. Navneet Srivastava",
     "specialization": "Classical Homeopathy & Chronic Care",
     "queue_paused": false,
     "current_token": 1,
@@ -202,7 +202,7 @@ Default Timezone: `Asia/Kolkata`
     "token": "1|SWvnLLEtg...",
     "user": {
       "id": 1,
-      "name": "Dr. Om Prakash",
+      "name": "Dr. Navneet Srivastava",
       "email": "doctor@prakashhomeo.com",
       "role": "doctor"
     }

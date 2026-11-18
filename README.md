@@ -1,7 +1,7 @@
 # Prakash Homeo Hall (प्रकाश होमियो हॉल)
 ## Doctor Clinic Online Appointment Booking & Live Queue Management System
 
-एक पूर्ण एवं आधुनिक **Doctor Clinic Appointment Booking & Live Queue Management System** जो विशेष रूप से **Prakash Homeo Hall (Dr. Om Prakash, B.H.M.S.), Chandiyana, Fatehpur, Uttar Pradesh** के लिए तैयार किया गया है।
+एक पूर्ण एवं आधुनिक **Doctor Clinic Appointment Booking & Live Queue Management System** जो विशेष रूप से **Prakash Homeo Hall (Dr. Navneet Srivastava, B.H.M.S.), Chandiyana, Fatehpur, Uttar Pradesh** के लिए तैयार किया गया है।
 
 यह सिस्टम 100% **Free & Open-Source** तकनीकों पर आधारित है। इसमें किसी भी Paid Service (Firebase, Pusher, Paid SMS/WhatsApp Gateway) की आवश्यकता नहीं है।
 
@@ -24,7 +24,7 @@
 ## 👥 Three Complete Panels Included
 
 ### 1. Patient Panel
-- **Doctor & Clinic Information**: View Dr. Om Prakash's profile, B.H.M.S. qualification, address in Chandiyana Fatehpur, and OPD timings (10:00 AM - 1:00 PM, 5:00 PM - 8:00 PM).
+- **Doctor & Clinic Information**: View Dr. Navneet Srivastava's profile, B.H.M.S. qualification, address in Chandiyana Fatehpur, and OPD timings (10:00 AM - 1:00 PM, 5:00 PM - 8:00 PM).
 - **Online Booking**: Select date, pick 15-minute slot, enter patient details with double-click protection.
 - **Booking Confirmation**: Generates unique booking ID (e.g. `PHH-261118-001ABC`) & sequential daily token number. Option to copy/share appointment slip.
 - **Live Queue Tracking**: Real-time 5-second polling showing:

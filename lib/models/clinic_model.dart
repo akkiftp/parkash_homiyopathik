@@ -53,7 +53,7 @@ class ClinicInfo {
     var list = (json['opd_timings'] as List<dynamic>?) ?? [];
     return ClinicInfo(
       clinicName: json['clinic_name'] ?? 'Prakash Homeo Hall',
-      doctorName: json['doctor_name'] ?? 'Dr. Om Prakash',
+      doctorName: json['doctor_name'] ?? 'Dr. Navneet Srivastava',
       qualification: json['qualification'] ?? 'B.H.M.S.',
       specialization: json['specialization'] ?? 'Classical Homeopathy',
       address: json['address'] ?? 'Chandiyana, Fatehpur, Uttar Pradesh',

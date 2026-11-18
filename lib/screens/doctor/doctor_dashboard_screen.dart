@@ -58,7 +58,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Doctor Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-            Text('Dr. Om Prakash (B.H.M.S.)', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+            Text('Dr. Navneet Srivastava (B.H.M.S.)', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
           ],
         ),
         actions: [

@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $doctor = User::updateOrCreate(
             ['email' => 'doctor@prakashhomeo.com'],
             [
-                'name' => 'Dr. Om Prakash',
+                'name' => 'Dr. Navneet Srivastava',
                 'password' => Hash::make('password123'),
                 'role' => 'doctor',
             ]
@@ -49,11 +49,11 @@ class DatabaseSeeder extends Seeder
         );
 
         // 2. Seed Clinic Settings
-        $setting = ClinicSetting::firstOrCreate(
+        $setting = ClinicSetting::updateOrCreate(
             ['id' => 1],
             [
                 'clinic_name' => 'Prakash Homeo Hall',
-                'doctor_name' => 'Dr. Om Prakash',
+                'doctor_name' => 'Dr. Navneet Srivastava',
                 'qualification' => 'B.H.M.S. (Senior Homeopathic Consultant)',
                 'specialization' => 'Classical Homeopathy & Chronic Care',
                 'address' => 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601',

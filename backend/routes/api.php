@@ -17,7 +17,7 @@ Route::get('/', function () {
         'success' => true,
         'message' => 'Prakash Homeo Hall Clinic API is live and operational.',
         'clinic' => 'Prakash Homeo Hall',
-        'doctor' => 'Dr. Om Prakash (B.H.M.S.)',
+        'doctor' => 'Dr. Navneet Srivastava (B.H.M.S.)',
         'status' => 'online',
         'timezone' => 'Asia/Kolkata',
         'endpoints' => [

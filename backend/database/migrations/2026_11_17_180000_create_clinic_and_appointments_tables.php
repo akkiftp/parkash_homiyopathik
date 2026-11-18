@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('clinic_settings', function (Blueprint $table) {
             $table->id();
             $table->string('clinic_name')->default('Prakash Homeo Hall');
-            $table->string('doctor_name')->default('Dr. Om Prakash');
+            $table->string('doctor_name')->default('Dr. Navneet Srivastava');
             $table->string('qualification')->default('B.H.M.S. (Senior Homeopathic Consultant)');
             $table->string('specialization')->default('Classical Homeopathy & Chronic Care');
             $table->string('address')->default('Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601');

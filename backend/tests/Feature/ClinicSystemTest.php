@@ -30,7 +30,7 @@ class ClinicSystemTest extends TestCase
                 'success' => true,
                 'data' => [
                     'clinic_name' => 'Prakash Homeo Hall',
-                    'doctor_name' => 'Dr. Om Prakash',
+                    'doctor_name' => 'Dr. Navneet Srivastava',
                 ],
             ]);
     }
