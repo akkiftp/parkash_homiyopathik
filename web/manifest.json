@@ -1,11 +1,11 @@
 {
-    "name": "parkash_homiyopathik",
-    "short_name": "parkash_homiyopathik",
+    "name": "Prakash Homeo Hall - Doctor Clinic & Queue",
+    "short_name": "Prakash Homeo",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0284C7",
+    "theme_color": "#0284C7",
+    "description": "Prakash Homeo Hall - Online Clinic Appointment Booking & Live Queue Management System. Dr. Navneet Srivastava (B.H.M.S.)",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
