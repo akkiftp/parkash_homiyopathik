@@ -179,7 +179,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isPaused ? const Color(0xFFF59E0B).withOpacity(0.2) : const Color(0xFF10B981).withOpacity(0.2),
+                            color: isPaused ? const Color(0xFFF59E0B).withValues(alpha: 0.2) : const Color(0xFF10B981).withValues(alpha: 0.2),
                           ),
                           child: Icon(
                             isPaused ? Icons.pause_circle_filled : Icons.play_circle_filled,
@@ -315,7 +315,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                                           Container(
                                             padding: const EdgeInsets.all(12),
                                             decoration: BoxDecoration(
-                                              color: AppTheme.primaryBlue.withOpacity(0.1),
+                                              color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                                               borderRadius: BorderRadius.circular(12),
                                             ),
                                             child: Text(
@@ -480,7 +480,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                                           return ListTile(
                                             contentPadding: const EdgeInsets.symmetric(vertical: 4),
                                             leading: CircleAvatar(
-                                              backgroundColor: AppTheme.warningOrange.withOpacity(0.15),
+                                              backgroundColor: AppTheme.warningOrange.withValues(alpha: 0.15),
                                               child: Text(
                                                 '#${p.tokenNumber}',
                                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.warningOrange),
@@ -522,7 +522,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                                     final item = allToday[index];
                                     return ListTile(
                                       leading: CircleAvatar(
-                                        backgroundColor: item.statusColor.withOpacity(0.12),
+                                        backgroundColor: item.statusColor.withValues(alpha: 0.12),
                                         child: Text(
                                           item.tokenNumber != null ? '#${item.tokenNumber}' : '-',
                                           style: TextStyle(fontWeight: FontWeight.bold, color: item.statusColor),
@@ -533,7 +533,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> with Sing
                                       trailing: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: item.statusColor.withOpacity(0.12),
+                                          color: item.statusColor.withValues(alpha: 0.12),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(

@@ -54,6 +54,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: const Row(
               children: [
                 Icon(Icons.warning_amber_rounded, color: AppTheme.dangerRed),
@@ -67,7 +68,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'For security verification, please enter the mobile number used during booking:',
+                    'सुरक्षा सत्यापन: बुकिंग करते समय दिया गया 10-अंकों का मोबाइल नंबर दर्ज करें:',
                     style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
                   ),
                   const SizedBox(height: 16),
@@ -92,6 +93,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       labelText: 'Verification Mobile Number *',
                       hintText: '10-digit mobile',
                       prefixIcon: Icon(Icons.phone_outlined),
+                      prefixText: '+91 ',
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -141,7 +143,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                           nav.pop();
                           messenger.showSnackBar(
                             const SnackBar(
-                              content: Text('Appointment has been cancelled successfully.'),
+                              content: Text('Appointment has been cancelled successfully. Time slot released.'),
                               backgroundColor: AppTheme.accentGreen,
                             ),
                           );
@@ -188,11 +190,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 760),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Search Code Input Card
+                // Search Input Card
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -203,8 +205,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
                             controller: _codeController,
                             textCapitalization: TextCapitalization.characters,
                             decoration: const InputDecoration(
-                              labelText: 'Booking ID',
-                              hintText: 'PHH-261117-001',
+                              labelText: 'Enter Booking ID',
+                              hintText: 'PHH-261118-001',
                               prefixIcon: Icon(Icons.search),
                               contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             ),
@@ -215,7 +217,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         ElevatedButton(
                           onPressed: prov.isLoading ? null : _search,
                           style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
                           ),
                           child: prov.isLoading
                               ? const SizedBox(
@@ -238,7 +240,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEF2F2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: const Color(0xFFFECACA)),
                     ),
                     child: Row(
@@ -257,12 +259,16 @@ class _TrackingScreenState extends State<TrackingScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Live Tracking Content
+                // Live Content
                 if (apt != null) ...[
-                  // Live Auto-Refresh indicator
+                  // Live Sync Pill
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Text(
+                        'Live Status • ${apt.appointmentDate}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textDark),
+                      ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
@@ -279,84 +285,101 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               child: CircularProgressIndicator(strokeWidth: 1.5, color: AppTheme.accentGreen),
                             ),
                             SizedBox(width: 6),
-                            Text('Auto-updating every 5s', style: TextStyle(fontSize: 11, color: Color(0xFF166534))),
+                            Text('Syncing every 5s', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF166534))),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
 
-                  // Main Status Card
-                  Card(
-                    color: apt.statusColor.withOpacity(0.08),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: apt.statusColor.withOpacity(0.3), width: 1.5),
+                  // Call Alert Banner (If patient called to room)
+                  if (apt.isCalled) ...[
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF7C3AED), Color(0xFF6D28D9)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.door_front_door_rounded, color: Colors.white, size: 36),
+                          SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'YOUR TOKEN HAS BEEN CALLED!',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'डॉक्टर ने आपको बुलाया है। कृपया तुरंत कंसल्टेशन रूम में प्रवेश करें।',
+                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 14),
+                  ] else if (apt.isInConsultation) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0284C7).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppTheme.primaryBlue),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.medical_information, color: AppTheme.primaryBlue, size: 32),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'आप वर्तमान में डॉ. ओम प्रकाश के साथ परामर्श (Consultation) में हैं।',
+                              style: TextStyle(color: AppTheme.primaryDarkBlue, fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+
+                  // Visual Flow Step Progress Bar
+                  Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('YOUR APPOINTMENT TOKEN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textMuted)),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    apt.tokenNumber != null ? '#${apt.tokenNumber}' : 'Unassigned',
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: apt.statusColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: apt.statusColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  apt.statusDisplay,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Divider(height: 24),
+                          const Text('Consultation Progress / परामर्श स्थिति', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                          const SizedBox(height: 16),
                           Row(
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Patient Name', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
-                                    const SizedBox(height: 2),
-                                    Text(apt.patientName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Scheduled Slot', style: TextStyle(fontSize: 12, color: AppTheme.textMuted)),
-                                    const SizedBox(height: 2),
-                                    Text('${apt.appointmentTime} (${apt.appointmentDate})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                  ],
-                                ),
-                              ),
+                              _buildStepIndicator('Booked', apt.isBooked || apt.isCheckedIn || apt.isCalled || apt.isInConsultation || apt.isCompleted, Icons.check),
+                              _buildStepConnector(apt.isCheckedIn || apt.isCalled || apt.isInConsultation || apt.isCompleted),
+                              _buildStepIndicator('Checked In', apt.isCheckedIn || apt.isCalled || apt.isInConsultation || apt.isCompleted, Icons.how_to_reg),
+                              _buildStepConnector(apt.isCalled || apt.isInConsultation || apt.isCompleted),
+                              _buildStepIndicator('Called', apt.isCalled || apt.isInConsultation || apt.isCompleted, Icons.volume_up),
+                              _buildStepConnector(apt.isInConsultation || apt.isCompleted),
+                              _buildStepIndicator('In Room', apt.isInConsultation || apt.isCompleted, Icons.meeting_room),
+                              _buildStepConnector(apt.isCompleted),
+                              _buildStepIndicator('Done', apt.isCompleted, Icons.done_all),
                             ],
                           ),
                         ],
@@ -364,9 +387,74 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
-                  // Queue Position & Waiting Time Grid
+                  // Big Token Badge Card
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 100,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              gradient: AppTheme.primaryGradient,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: [
+                                const Text('YOUR TOKEN', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+                                Text(
+                                  apt.tokenNumber != null ? '#${apt.tokenNumber}' : '--',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  apt.status.toUpperCase(),
+                                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  apt.patientName,
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textDark),
+                                ),
+                                const SizedBox(height: 2),
+                                Text('Booking Code: ${apt.bookingId}', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+                                Text('Slot Time: ${apt.appointmentTime} (15m)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue)),
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: apt.statusColor.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    apt.statusDisplay,
+                                    style: TextStyle(color: apt.statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Queue Position & Waiting Time Grid (for Today's active appointments)
                   if (apt.isToday && (apt.isCheckedIn || apt.isWaiting || apt.isCalled || apt.isInConsultation)) ...[
                     Row(
                       children: [
@@ -378,7 +466,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Current With Doctor', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                  const Text('With Doctor', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 4),
                                   Text(
                                     apt.currentRunningToken != null ? '#${apt.currentRunningToken}' : 'None',
@@ -390,7 +478,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                                   ),
                                   Text(
                                     apt.queuePaused ? 'Queue is paused' : 'In Consultation Room',
-                                    style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                    style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
                                   ),
                                 ],
                               ),
@@ -407,7 +495,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Your Position', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                  const Text('Queue Position', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 4),
                                   Text(
                                     apt.isInConsultation
@@ -420,8 +508,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
                                     ),
                                   ),
                                   Text(
-                                    apt.patientsAhead != null ? '${apt.patientsAhead} ahead of you' : 'In waiting list',
-                                    style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                    apt.patientsAhead != null ? '${apt.patientsAhead} ahead of you' : 'In queue',
+                                    style: const TextStyle(fontSize: 10, color: AppTheme.textMuted),
                                   ),
                                 ],
                               ),
@@ -430,7 +518,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         ),
                         const SizedBox(width: 10),
 
-                        // Estimated Waiting Time
+                        // Estimated Wait Time
                         Expanded(
                           child: Card(
                             child: Padding(
@@ -438,7 +526,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Estimated Wait', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                  const Text('Estimated Wait', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
                                   const SizedBox(height: 4),
                                   Text(
                                     apt.isInConsultation
@@ -450,7 +538,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                                       color: AppTheme.accentGreen,
                                     ),
                                   ),
-                                  const Text('Estimated approx.', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
+                                  const Text('Approximate', style: TextStyle(fontSize: 10, color: AppTheme.textMuted)),
                                 ],
                               ),
                             ),
@@ -458,74 +546,49 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                   ] else if (apt.isBooked) ...[
-                    // Notice when booked but not checked-in yet
-                    Card(
-                      color: const Color(0xFFEFF6FF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: const BorderSide(color: Color(0xFFBFDBFE)),
+                    // Not Checked-In Notice
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Icon(Icons.location_on, color: AppTheme.primaryBlue, size: 28),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Check-in Required at Reception',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryDarkBlue),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    'When you reach Prakash Homeo Hall, please check-in with the receptionist to activate your queue position.',
-                                    style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF)),
-                                  ),
-                                ],
-                              ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.how_to_reg, color: AppTheme.primaryBlue, size: 28),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'रिसेप्शन पर चेक-इन अनिवार्य है',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryDarkBlue),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'क्लिनिक पहुँचकर कृपया रिसेप्शन पर अपना टोकन नंबर बताएं ताकि डॉक्टर के डैशबोर्ड में आपकी कतार स्थिति सक्रिय हो सके।',
+                                  style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF)),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                   ],
 
-                  // Non-guaranteed disclaimer
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.access_time, size: 16, color: AppTheme.textMuted),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Estimated waiting time is calculated based on current active patients. Consultation times may vary based on clinical requirements.',
-                            style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Cancellation Button (only if not completed/cancelled)
+                  // Cancellation Option (Verified)
                   if (!apt.isCompleted && !apt.isCancelled && !apt.isInConsultation) ...[
+                    const SizedBox(height: 10),
                     OutlinedButton.icon(
                       onPressed: _showCancelDialog,
-                      icon: const Icon(Icons.cancel_outlined, color: AppTheme.dangerRed),
-                      label: const Text('Cancel My Appointment', style: TextStyle(color: AppTheme.dangerRed)),
+                      icon: const Icon(Icons.cancel_outlined, color: AppTheme.dangerRed, size: 18),
+                      label: const Text('Cancel My Appointment / अपॉइंटमेंट रद्द करें', style: TextStyle(color: AppTheme.dangerRed)),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppTheme.dangerRed),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -537,6 +600,37 @@ class _TrackingScreenState extends State<TrackingScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator(String label, bool isDone, IconData icon) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 14,
+          backgroundColor: isDone ? AppTheme.accentGreen : const Color(0xFFE2E8F0),
+          child: Icon(icon, size: 14, color: isDone ? Colors.white : AppTheme.textMuted),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: isDone ? FontWeight.bold : FontWeight.normal,
+            color: isDone ? AppTheme.textDark : AppTheme.textMuted,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepConnector(bool isDone) {
+    return Expanded(
+      child: Container(
+        height: 2,
+        color: isDone ? AppTheme.accentGreen : const Color(0xFFE2E8F0),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
       ),
     );
   }

@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "ankitappsstudio"
+  },
+  "targets": {
+    "ankitappsstudio": {
+      "hosting": {
+        "prakash-homeo": [
+          "prakash-homeo-hall-fatehpur"
+        ]
+      }
+    }
+  }
+}

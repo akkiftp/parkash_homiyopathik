@@ -12,25 +12,24 @@ class ConfirmationScreen extends StatelessWidget {
   void _shareSlip(BuildContext context) {
     final text = '''
 =================================
-PRAKASH HOMEO HALL - APPOINTMENT SLIP
+🏥 PRAKASH HOMEO HALL (प्रकाश होमियो हॉल)
+डॉ. ओम प्रकाश (B.H.M.S.)
 =================================
-Booking ID: ${appointment.bookingId}
-Token Number: #${appointment.tokenNumber ?? 'N/A'}
-Patient Name: ${appointment.patientName}
-Doctor: ${appointment.doctorName ?? 'Dr. Om Prakash'} (B.H.M.S.)
-Specialization: Classical Homeopathy
-Date: ${appointment.appointmentDate}
-Time: ${appointment.appointmentTime}
-Clinic: ${appointment.clinicName ?? 'Prakash Homeo Hall'}
-Address: ${appointment.address ?? 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh - 212601'}
+📋 बुकिंग कोड: ${appointment.bookingId}
+🎫 टोकन नंबर: #${appointment.tokenNumber ?? 'N/A'}
+👤 मरीज का नाम: ${appointment.patientName}
+📅 तारीख: ${appointment.appointmentDate}
+⏰ समय: ${appointment.appointmentTime}
+📍 पता: चौक, चंदियाना, फतेहपुर, उ.प्र. - 212601
+📞 फोन: +91 94150 12345
 =================================
-Please show this slip at the reception upon arrival.
+कृपया क्लिनिक पहुँचने पर रिसेप्शन पर चेक-इन कराएं।
 ''';
 
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Appointment slip details copied to clipboard! You can paste or save it.'),
+        content: Text('Appointment slip details copied! You can paste and share via WhatsApp or SMS.'),
         backgroundColor: AppTheme.accentGreen,
       ),
     );
@@ -38,10 +37,12 @@ Please show this slip at the reception upon arrival.
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          Navigator.popUntil(context, (route) => route.isFirst);
+        }
       },
       child: Scaffold(
         appBar: AppBar(
@@ -64,11 +65,15 @@ Please show this slip at the reception upon arrival.
                 children: [
                   // Success Header
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFBBF7D0)),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFF0FDF4), Color(0xFFDCFCE7)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFF86EFAC)),
                     ),
                     child: Column(
                       children: [
@@ -78,13 +83,13 @@ Please show this slip at the reception upon arrival.
                             shape: BoxShape.circle,
                             color: AppTheme.accentGreen,
                           ),
-                          child: const Icon(Icons.check, size: 36, color: Colors.white),
+                          child: const Icon(Icons.check_rounded, size: 36, color: Colors.white),
                         ),
                         const SizedBox(height: 12),
                         const Text(
                           'Appointment Booked Successfully!',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF166534),
                           ),
@@ -92,110 +97,185 @@ Please show this slip at the reception upon arrival.
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Your time slot has been secured in the doctor schedule.',
-                          style: TextStyle(fontSize: 13, color: Color(0xFF15803D)),
+                          'आपकी अपॉइंटमेंट सफलतापूर्वक दर्ज हो चुकी है।',
+                          style: TextStyle(fontSize: 13, color: Color(0xFF15803D), fontWeight: FontWeight.w600),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Slip Card
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Booking Code Banner
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: AppTheme.surfaceLight,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: const Color(0xFFE2E8F0)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
+                  // Digital Clinic Appointment Pass
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Top Ticket Bar
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                          decoration: const BoxDecoration(
+                            gradient: AppTheme.primaryGradient,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(19)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'PRAKASH HOMEO HALL',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.5),
+                                  ),
+                                  Text(
+                                    'Dr. Om Prakash (B.H.M.S.)',
+                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'OFFICIAL PASS',
+                                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Token & Booking Code Box
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            children: [
+                              // Token Big Badge
+                              Container(
+                                width: 90,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryLightBlue,
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Text('TOKEN', style: TextStyle(color: AppTheme.primaryDarkBlue, fontSize: 11, fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '#${appointment.tokenNumber ?? "1"}',
+                                      style: const TextStyle(
+                                        color: AppTheme.primaryDarkBlue,
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const Text('OPD Pass', style: TextStyle(color: AppTheme.textMuted, fontSize: 10)),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Booking ID', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                                    const Text('BOOKING ID', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textMuted)),
                                     const SizedBox(height: 2),
                                     Text(
                                       appointment.bookingId,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: AppTheme.textDark,
                                         letterSpacing: 0.5,
-                                        color: AppTheme.primaryBlue,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFDCFCE7),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: const Text(
+                                        'CONFIRMED & SECURED',
+                                        style: TextStyle(color: Color(0xFF166534), fontSize: 10, fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ],
                                 ),
-                                if (appointment.tokenNumber != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.primaryBlue,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        const Text('TOKEN', style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
-                                        Text(
-                                          '#${appointment.tokenNumber}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Dashed Ticket Line Divider
+                        Row(
+                          children: List.generate(
+                            30,
+                            (index) => Expanded(
+                              child: Container(
+                                color: index % 2 == 0 ? Colors.transparent : const Color(0xFFCBD5E1),
+                                height: 1.5,
+                              ),
                             ),
                           ),
+                        ),
 
-                          const SizedBox(height: 20),
+                        // Details Rows
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildTicketDetail('Patient Name', appointment.patientName, Icons.person_outline),
+                              _buildTicketDetail('Mobile Number', '+91 ${appointment.mobile}', Icons.phone_outlined),
+                              _buildTicketDetail('Appointment Date', appointment.appointmentDate, Icons.calendar_today_outlined),
+                              _buildTicketDetail('Scheduled Time Slot', appointment.appointmentTime, Icons.access_time_outlined),
+                              _buildTicketDetail('Clinic Address', appointment.address ?? 'Chowk, Chandiyana, Fatehpur', Icons.location_on_outlined),
+                            ],
+                          ),
+                        ),
 
-                          _buildDetailRow('Patient Name', appointment.patientName, icon: Icons.person_outline),
-                          _buildDetailRow('Mobile Number', '+91 ${appointment.mobile}', icon: Icons.phone_outlined),
-                          _buildDetailRow('Doctor', appointment.doctorName ?? 'Dr. Om Prakash (B.H.M.S.)', icon: Icons.medical_services_outlined),
-                          _buildDetailRow('Appointment Date', appointment.appointmentDate, icon: Icons.calendar_today_outlined),
-                          _buildDetailRow('Scheduled Time', appointment.appointmentTime, icon: Icons.access_time_outlined),
-                          _buildDetailRow('Clinic', appointment.clinicName ?? 'Prakash Homeo Hall', icon: Icons.local_hospital_outlined),
-                          _buildDetailRow('Address', appointment.address ?? 'Chowk, Chandiyana, Fatehpur, Uttar Pradesh', icon: Icons.location_on_outlined),
-
-                          const Divider(height: 24),
-
-                          // Notice
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFBEB),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFFDE68A)),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.info_outline, size: 18, color: Color(0xFFD97706)),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Important: When you arrive at the clinic, please show this booking ID at the reception to check-in and join the live doctor consultation queue.',
-                                    style: TextStyle(fontSize: 12, color: Color(0xFF92400E)),
-                                  ),
+                        // Helpful Notice Footer
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFFBEB),
+                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(19)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.info_rounded, color: Color(0xFFD97706), size: 18),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'महत्वपूर्ण: क्लिनिक पहुँचकर रिसेप्शन पर यह टोकन नंबर बताएं ताकि आपका नाम डॉक्टर की लाइव कतार में चालू हो सके।',
+                                  style: TextStyle(fontSize: 12, color: Color(0xFF92400E), height: 1.3),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -211,7 +291,7 @@ Please show this slip at the reception upon arrival.
                         ),
                       );
                     },
-                    icon: const Icon(Icons.track_changes),
+                    icon: const Icon(Icons.my_location_rounded),
                     label: const Text('Track Live Queue Status Now'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -224,14 +304,14 @@ Please show this slip at the reception upon arrival.
                   OutlinedButton.icon(
                     onPressed: () => _shareSlip(context),
                     icon: const Icon(Icons.share_outlined),
-                    label: const Text('Download / Share Appointment Slip'),
+                    label: const Text('Share / Copy Appointment Slip'),
                   ),
 
                   const SizedBox(height: 10),
 
                   TextButton(
                     onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-                    child: const Text('Back to Home'),
+                    child: const Text('Back to Home / होम पर वापस जाएं'),
                   ),
                 ],
               ),
@@ -242,24 +322,22 @@ Please show this slip at the reception upon arrival.
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {IconData? icon}) {
+  Widget _buildTicketDetail(String label, String value, IconData icon) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (icon != null) ...[
-            Icon(icon, size: 18, color: AppTheme.textMuted),
-            const SizedBox(width: 10),
-          ],
+          Icon(icon, size: 16, color: AppTheme.textMuted),
+          const SizedBox(width: 10),
           SizedBox(
-            width: 120,
-            child: Text(label, style: const TextStyle(fontSize: 13, color: AppTheme.textMuted)),
+            width: 110,
+            child: Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textDark),
             ),
           ),
         ],

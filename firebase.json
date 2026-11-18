@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "prakash-homeo-hall-fatehpur",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

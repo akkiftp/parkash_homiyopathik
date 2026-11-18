@@ -468,7 +468,7 @@ class _ReceptionDashboardScreenState extends State<ReceptionDashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CircleAvatar(
-                                      backgroundColor: apt.statusColor.withOpacity(0.12),
+                                      backgroundColor: apt.statusColor.withValues(alpha: 0.12),
                                       child: Text(
                                         apt.tokenNumber != null ? '#${apt.tokenNumber}' : '-',
                                         style: TextStyle(fontWeight: FontWeight.bold, color: apt.statusColor),
@@ -489,7 +489,7 @@ class _ReceptionDashboardScreenState extends State<ReceptionDashboardScreen> {
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: apt.statusColor.withOpacity(0.12),
+                                                  color: apt.statusColor.withValues(alpha: 0.12),
                                                   borderRadius: BorderRadius.circular(10),
                                                 ),
                                                 child: Text(
@@ -564,7 +564,7 @@ class _ReceptionDashboardScreenState extends State<ReceptionDashboardScreen> {
       child: FilterChip(
         label: Text(label, style: const TextStyle(fontSize: 12)),
         selected: isSelected,
-        selectedColor: AppTheme.primaryBlue.withOpacity(0.15),
+        selectedColor: AppTheme.primaryBlue.withValues(alpha: 0.15),
         labelStyle: TextStyle(
           color: isSelected ? AppTheme.primaryBlue : AppTheme.textDark,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

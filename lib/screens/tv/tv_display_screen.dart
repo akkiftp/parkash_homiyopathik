@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -12,12 +13,28 @@ class TvDisplayScreen extends StatefulWidget {
 }
 
 class _TvDisplayScreenState extends State<TvDisplayScreen> {
+  late Timer _clockTimer;
+  DateTime _now = DateTime.now();
+
   @override
   void initState() {
     super.initState();
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {
+          _now = DateTime.now();
+        });
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TvQueueProvider>().startPolling();
     });
+  }
+
+  @override
+  void dispose() {
+    _clockTimer.cancel();
+    super.dispose();
   }
 
   @override
@@ -26,15 +43,15 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
     final queue = prov.liveQueue;
     final isPaused = queue?.queuePaused ?? false;
 
-    final currentTimeStr = DateFormat('hh:mm:ss a').format(DateTime.now());
-    final currentDateStr = DateFormat('EEEE, d MMMM yyyy').format(DateTime.now());
+    final currentTimeStr = DateFormat('hh:mm:ss a').format(_now);
+    final currentDateStr = DateFormat('EEEE, d MMMM yyyy').format(_now);
 
     return Scaffold(
       backgroundColor: AppTheme.tvBackground,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Clinic Waiting Room Queue Display', style: TextStyle(color: Colors.white70, fontSize: 16)),
+        title: const Text('Clinic Waiting Hall Queue Display', style: TextStyle(color: Colors.white70, fontSize: 16)),
         actions: [
           IconButton(
             tooltip: 'Close TV Display',
@@ -54,7 +71,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
               decoration: BoxDecoration(
                 color: AppTheme.tvCardBackground,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,7 +81,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppTheme.tvAccentCyan.withOpacity(0.15),
+                          color: AppTheme.tvAccentCyan.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(Icons.local_hospital, color: AppTheme.tvAccentCyan, size: 36),
@@ -160,9 +177,9 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(28),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [
-                            const Color(0xFF0C4A6E),
+                            Color(0xFF0C4A6E),
                             AppTheme.tvCardBackground,
                           ],
                           begin: Alignment.topLeft,
@@ -172,7 +189,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                         border: Border.all(color: AppTheme.tvAccentCyan, width: 2.5),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.tvAccentCyan.withOpacity(0.2),
+                            color: AppTheme.tvAccentCyan.withValues(alpha: 0.2),
                             blurRadius: 20,
                             spreadRadius: 2,
                           ),
@@ -253,7 +270,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                       decoration: BoxDecoration(
                         color: AppTheme.tvCardBackground,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppTheme.tvAccentGreen.withOpacity(0.6), width: 2),
+                        border: Border.all(color: AppTheme.tvAccentGreen.withValues(alpha: 0.6), width: 2),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -261,7 +278,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppTheme.tvAccentGreen.withOpacity(0.2),
+                              color: AppTheme.tvAccentGreen.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(color: AppTheme.tvAccentGreen),
                             ),
@@ -323,7 +340,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                 decoration: BoxDecoration(
                   color: AppTheme.tvCardBackground,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +365,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -386,7 +403,7 @@ class _TvDisplayScreenState extends State<TvDisplayScreen> {
                                 return Container(
                                   width: 90,
                                   decoration: BoxDecoration(
-                                    color: isNext ? AppTheme.tvAccentGreen.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                                    color: isNext ? AppTheme.tvAccentGreen.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
                                       color: isNext ? AppTheme.tvAccentGreen : Colors.white24,
